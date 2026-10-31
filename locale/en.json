@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Model Evaluation",
+    "description": "Evaluate one or more models on jsonl/json/csv datasets: automatic scoring, leaderboard, head-to-head comparison and reports; sensitive data stays on local/intranet endpoints."
+  }
+}

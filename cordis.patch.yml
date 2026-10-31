@@ -1,0 +1,34 @@
+- insert:
+    - id: model-eval
+      name: 'dsh-model-eval'
+      config:
+        # Models under evaluation. The agent can only pick from this list by id;
+        # it cannot add endpoints. Prefer apiKeyEnv (an environment variable
+        # name) over writing keys into this file.
+        #   - id: local-qwen
+        #     baseURL: 'http://127.0.0.1:11434/v1'
+        #     model: 'qwen2.5:7b'
+        #   - id: deepseek-chat
+        #     baseURL: 'https://api.deepseek.com/v1'
+        #     model: 'deepseek-chat'
+        #     apiKeyEnv: 'DEEPSEEK_API_KEY'
+        # Optional per-model overrides: temperature, maxTokens, disableThinking.
+        models: []
+        # Models used when a run does not name any; empty = all models.
+        defaultModels: []
+        # Empty = <workspace>/.model-eval
+        outputRoot: ''
+        concurrency: 4
+        maxSamples: 5000
+        timeoutMs: 120000
+        retries: 2
+        temperature: 0
+        maxTokens: 1024
+        disableThinking: false
+        # Pass threshold for graded scorers (f1 / rouge_l / bleu).
+        threshold: 0.5
+        # true = every run behaves as sensitive (local/intranet endpoints only,
+        # no sample text in reports or tool results).
+        localOnly: false
+        # Intranet host names treated as local, e.g. 'llm.hospital.lan' or '*.corp.example'.
+        trustedHosts: []

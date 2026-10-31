@@ -1,0 +1,19 @@
+{
+  "data": [
+    {
+      "id": "m1",
+      "messages": [
+        { "role": "system", "content": "你是医学助手。" },
+        { "role": "user", "content": "高血压的英文缩写是什么？" },
+        { "role": "assistant", "content": "HTN" }
+      ]
+    },
+    {
+      "instruction": "把下面的句子翻译成英文",
+      "input": "今天天气很好",
+      "output": "The weather is nice today"
+    },
+    { "id": "m3", "note": "没有输入字段，应被跳过" },
+    { "id": "m1", "prompt": "重复 id", "reference": "x" }
+  ]
+}

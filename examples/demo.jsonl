@@ -1,0 +1,6 @@
+{"id":"demo-1","category":"医学常识","question":"成人正常静息心率范围是？","choices":["40-50 次/分","60-100 次/分","110-130 次/分","140-160 次/分"],"answer":"B"}
+{"id":"demo-2","category":"医学常识","question":"胰岛素的主要作用是？","choices":["升高血糖","降低血糖","升高血压","降低体温"],"answer":"B"}
+{"id":"demo-3","category":"数学","question":"一盒药有 24 片，每天服 3 片，可以服用几天？只回答数字。","answer":"8"}
+{"id":"demo-4","category":"数学","question":"某病房有 36 张床，入住率 75%，入住了多少张床？只回答数字。","answer":"27"}
+{"id":"demo-5","category":"术语","question":"“高血压”的英文缩写是什么？只回答缩写。","answer":["HTN","HBP"]}
+{"id":"demo-6","category":"术语","question":"把“心肌梗死”翻译成英文。","answer":"myocardial infarction","scorer":"includes"}

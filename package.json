@@ -1,0 +1,47 @@
+{
+  "name": "dsh-model-eval",
+  "version": "0.1.0",
+  "description": "Model evaluation for DeepSeek Harness: run OpenAI-compatible models over jsonl/json/csv datasets, score with rule-based metrics, compare models, and produce reports. Sensitive mode restricts data to local/intranet endpoints.",
+  "type": "module",
+  "license": "MIT",
+  "author": "wld007",
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "cordis",
+    "plugin",
+    "llm",
+    "evaluation",
+    "benchmark",
+    "leaderboard"
+  ],
+  "engines": {
+    "node": ">=20",
+    "dsh": ">=0.2.1-0"
+  },
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "lib/**/*.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "LICENSE",
+    "README.md",
+    "examples/*.jsonl"
+  ],
+  "scripts": {
+    "test": "node test/scorers.mjs && node test/datasets.mjs && node test/run.mjs"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}
