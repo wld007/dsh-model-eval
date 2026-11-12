@@ -2,12 +2,12 @@
 
 DeepSeek Harness 模型评测插件：在 jsonl / json / csv 数据集上评测一个或多个 OpenAI 兼容模型（DeepSeek、OpenAI、vLLM、Ollama、LM Studio、SGLang 等），自动打分，生成排行榜、分类准确率、两两对比和答错样本报告。
 
-当前为 **阶段 1（核心闭环）**。后续：LLM 裁判 / Excel 导出（阶段 2）、内置基准 MMLU / C-Eval / GSM8K（阶段 3）、GUI 页面与人工复核（阶段 4）、Agent / 工作流评测（阶段 5）。
+当前为 **0.2（核心闭环 + 基础界面）**：侧栏「模型评测」页面可以查看模型、检测连通、发起评测、实时看进度、排行榜和报告。后续：LLM 裁判 / Excel 导出、内置基准 MMLU / C-Eval / GSM8K、人工复核、Agent / 工作流评测。
 
 ## 安装
 
-1. DSH 侧栏 →「插件」→「添加插件」，填入本目录绝对路径 `/Users/wanglidong/VibeCoding/dsh-model-eval`，然后启用。
-   命令行等价：`dsh plugin add /Users/wanglidong/VibeCoding/dsh-model-eval`
+1. DSH 侧栏 →「插件」→「添加插件」，填入 npm 包名 `dsh-model-eval`（或本仓库的本地路径），然后启用。
+   命令行等价：`dsh plugin add dsh-model-eval`
 2. 在 profile 的 `cordis.patch.yml` 中编辑 `model-eval` 的 `config.models`，配置待评测模型（见下）。
 3. 修改配置或代码后，在插件页停用再启用（Host 代码变更需重启 DSH）。
 
@@ -36,7 +36,9 @@ Agent 只能按 id 选择这里配置的模型，不能新增端点，评测数�
 
 ## 使用
 
-对 Agent 说：「用 local-qwen 和 deepseek-chat 评测 examples/demo.jsonl」，或用命令：
+**界面**：点左侧栏的「模型评测」图标，填数据集路径（可点「使用示例数据集」）、勾选模型和评分器，点「开始评测」；进度、排行榜（平均分条形图、准确率、延迟、Token）和完整报告都在批次详情页里，运行中可取消，取消/失败的批次可续跑。
+
+**对话**：对 Agent 说：「用 local-qwen 和 deepseek-chat 评测 examples/demo.jsonl」，或用命令：
 
 ```
 /eval /path/to/data.jsonl --models local-qwen,deepseek-chat --limit 50

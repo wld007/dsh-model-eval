@@ -5,7 +5,10 @@
  * Model endpoints and keys come only from the user's plugin settings: tools
  * select models by id and cannot point evaluation data anywhere new.
  */
+import { fileURLToPath } from 'node:url'
 import { createService, SCORER_CHOICES } from './lib/service.js'
+
+const CHANNEL = '/model-eval'
 
 export const name = 'model-eval'
 export const inject = ['tools']
@@ -154,6 +157,83 @@ export function apply(ctx, config = {}) {
     }],
   }))
 
+  // Package-private RPC for the Web page (client.js). Same operations as the
+  // agent tools above, through the same service.
+  const examplePath = fileURLToPath(new URL('./examples/demo.jsonl', import.meta.url))
+  async function dispatch(endpoint, request) {
+    try {
+      switch (endpoint) {
+        case 'models': return { ok: true, value: { ...service.modelsInfo(), examplePath, defaultDirectory } }
+        case 'ping': return { ok: true, value: await service.ping(request.modelId) }
+        case 'list': return { ok: true, value: await service.list() }
+        case 'status': {
+          const { run, active } = await service.status(request.runId)
+          return { ok: true, value: { active, run: run ? publicRun(run) : null } }
+        }
+        case 'report': return { ok: true, value: await service.report(request.runId) }
+        case 'start': return { ok: true, value: await service.start({
+          dataset: request.dataset,
+          models: Array.isArray(request.models) ? request.models.map(String) : undefined,
+          scorer: request.scorer ? String(request.scorer) : undefined,
+          limit: Number(request.limit) > 0 ? Number(request.limit) : undefined,
+          sensitive: request.sensitive === true,
+          resumeRunId: request.resumeRunId ? String(request.resumeRunId) : undefined,
+        }) }
+        case 'cancel': return { ok: true, value: await service.cancel(request.runId) }
+        default: return { ok: false, error: { code: 'not-found', message: `unknown method ${endpoint}`, details: {} } }
+      }
+    } catch (error) {
+      return { ok: false, error: { code: 'failed', message: String(error?.message ?? error), details: {} } }
+    }
+  }
+
+  ctx.inject(['connection', 'webServer'], (rpcCtx) => {
+    const route = {
+      kind: 'prefix',
+      path: CHANNEL,
+      handler: async (req, res) => {
+        const admission = rpcCtx.connection.admit(req)
+        if ('rejection' in admission) {
+          res.writeHead(admission.rejection)
+          res.end(admission.rejection === 401 ? 'unauthorized' : 'forbidden')
+          return
+        }
+        if (req.method !== 'POST') { res.writeHead(405); res.end(); return }
+        const endpoint = new URL(req.url ?? '/', 'http://x').pathname.slice(CHANNEL.length + 1)
+        if (!endpoint) { res.writeHead(404); res.end(); return }
+        if (req.headers['content-type']?.split(';', 1)[0].trim().toLowerCase() !== 'application/json') {
+          res.writeHead(415); res.end(); return
+        }
+        let body
+        try {
+          const chunks = []
+          let size = 0
+          for await (const chunk of req) {
+            size += chunk.length
+            if (size > 1_000_000) throw new Error('request body too large')
+            chunks.push(chunk)
+          }
+          body = JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}')
+        } catch (error) {
+          res.writeHead(400, { 'content-type': 'application/json' })
+          res.end(JSON.stringify({ error: String(error?.message ?? error) }))
+          return
+        }
+        const rpcId = typeof body?.rpcId === 'string' ? body.rpcId : 'invalid-request'
+        if (body?.type !== 'client-request' || body?.method !== endpoint) {
+          res.writeHead(400, { 'content-type': 'application/json' })
+          res.end(JSON.stringify({ type: 'server-response', rpcId, result: { ok: false, error: { code: 'bad-request', message: 'invalid client-request envelope', details: {} } } }))
+          return
+        }
+        const payload = body.payload && typeof body.payload === 'object' ? body.payload : {}
+        const result = await dispatch(endpoint, payload)
+        res.writeHead(200, { 'content-type': 'application/json' })
+        res.end(JSON.stringify({ type: 'server-response', rpcId, result }))
+      },
+    }
+    rpcCtx.effect(() => rpcCtx.webServer.register(route), 'model-eval: rpc route')
+  })
+
   ctx.inject(['commands'], (cmdCtx) => {
     const usage = '用法：/eval <数据集路径> [--models a,b] [--scorer auto|exact|includes|regex|choice|number|f1|rouge_l|bleu] [--limit N] [--sensitive]；续跑：/eval --resume <批次id>'
     const dispose = cmdCtx.commands.register({
@@ -195,6 +275,32 @@ export function apply(ctx, config = {}) {
     })
     cmdCtx.effect(() => dispose, 'model-eval: /eval command')
   })
+}
+
+/** Run view for the page: no API keys, no custom prompt text. */
+function publicRun(run) {
+  return {
+    id: run.id,
+    status: run.status,
+    startedAt: run.startedAt,
+    finishedAt: run.finishedAt,
+    dataset: run.dataset,
+    config: {
+      scorer: run.config?.scorer,
+      sensitive: run.config?.sensitive === true,
+      threshold: run.config?.threshold,
+      models: (run.config?.models ?? []).map((m) => ({ id: m.id, model: m.model })),
+    },
+    progress: run.progress,
+    runDir: run.runDir,
+    warnings: run.warnings ?? [],
+    error: run.error ?? null,
+    leaderboard: run.summary?.leaderboard ?? [],
+    models: (run.summary?.models ?? []).map((m) => ({
+      id: m.id, completed: m.completed, planned: m.planned, accuracy: m.accuracy,
+      meanScore: m.meanScore, errors: m.errors, latency: m.latency, tokens: m.tokens,
+    })),
+  }
 }
 
 function pct(value) {
