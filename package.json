@@ -1,6 +1,6 @@
 {
   "name": "dsh-model-eval",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Model evaluation for DeepSeek Harness: run OpenAI-compatible models over jsonl/json/csv datasets, score with rule-based metrics, compare models, and produce reports. Sensitive mode restricts data to local/intranet endpoints.",
   "type": "module",
   "license": "MIT",

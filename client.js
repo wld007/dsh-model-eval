@@ -9,7 +9,7 @@ window.__ModuleLoader__.load({
     const services = { ctx: null }
 
     const ZH = {
-      panel: '模型评测',
+      panel: '医疗模型评测',
       intro: '在数据集上评测一个或多个已配置的模型，自动打分并生成排行榜与报告。也可以在聊天里对 Agent 说「评测某个数据集」，或使用 /eval 命令。',
       'models.title': '已配置模型',
       'models.empty': '还没有配置模型。请在 profile 的 cordis.patch.yml 中给 model-eval 的 config.models 添加模型（id / baseURL / model / apiKeyEnv），然后在插件页停用再启用。',
@@ -58,7 +58,7 @@ window.__ModuleLoader__.load({
       'status.failed': '失败',
     }
     const EN = {
-      panel: 'Model Eval',
+      panel: 'Medical Model Eval',
       intro: 'Evaluate one or more configured models on a dataset, score automatically, and get a leaderboard and report. You can also ask the agent or use the /eval command.',
       'models.title': 'Configured models',
       'models.empty': 'No models configured. Add models to config.models of model-eval in the profile cordis.patch.yml (id / baseURL / model / apiKeyEnv), then disable and re-enable the plugin.',
