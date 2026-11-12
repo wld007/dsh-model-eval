@@ -5,6 +5,14 @@
   "type": "module",
   "license": "MIT",
   "author": "wld007",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wld007/dsh-model-eval.git"
+  },
+  "homepage": "https://github.com/wld007/dsh-model-eval#readme",
+  "bugs": {
+    "url": "https://github.com/wld007/dsh-model-eval/issues"
+  },
   "keywords": [
     "dsh",
     "deepseek-harness",
